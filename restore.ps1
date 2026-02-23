@@ -44,6 +44,24 @@ if (Test-Path "$BackupDir\settings.json") {
     $restored += "settings.json"
 }
 
+# Global CLAUDE.md (union merge — no overwrite)
+if (Test-Path "$BackupDir\CLAUDE.md") {
+    if (Test-Path "$ClaudeDir\CLAUDE.md") {
+        # Append lines from backup not already in local
+        $localLines = Get-Content "$ClaudeDir\CLAUDE.md"
+        $backupLines = Get-Content "$BackupDir\CLAUDE.md"
+        $newLines = $backupLines | Where-Object { $_ -notin $localLines }
+        if ($newLines) {
+            $newLines | Add-Content "$ClaudeDir\CLAUDE.md"
+        }
+        Write-Host "  [OK] CLAUDE.md (merged)" -ForegroundColor Green
+    } else {
+        Copy-Item "$BackupDir\CLAUDE.md" "$ClaudeDir\CLAUDE.md" -Force
+        Write-Host "  [OK] CLAUDE.md (restored)" -ForegroundColor Green
+    }
+    $restored += "CLAUDE.md"
+}
+
 # installed_plugins.json
 if (Test-Path "$BackupDir\installed_plugins.json") {
     New-Item -ItemType Directory -Force -Path "$ClaudeDir\plugins" | Out-Null

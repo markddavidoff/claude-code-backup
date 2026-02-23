@@ -49,6 +49,23 @@ if [[ -f "$BACKUP_DIR/settings.json" ]]; then
     ((RESTORED++)) || true
 fi
 
+# Global CLAUDE.md (union merge — no overwrite)
+if [[ -f "$BACKUP_DIR/CLAUDE.md" ]]; then
+    if [[ -f "$CLAUDE_DIR/CLAUDE.md" ]]; then
+        # Append lines from backup not already in local
+        while IFS= read -r line; do
+            if ! grep -qF "$line" "$CLAUDE_DIR/CLAUDE.md"; then
+                echo "$line" >> "$CLAUDE_DIR/CLAUDE.md"
+            fi
+        done < "$BACKUP_DIR/CLAUDE.md"
+        echo "  [OK] CLAUDE.md (merged)"
+    else
+        cp "$BACKUP_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
+        echo "  [OK] CLAUDE.md (restored)"
+    fi
+    ((RESTORED++)) || true
+fi
+
 # installed_plugins.json
 if [[ -f "$BACKUP_DIR/installed_plugins.json" ]]; then
     mkdir -p "$CLAUDE_DIR/plugins"

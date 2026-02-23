@@ -77,6 +77,13 @@ if [[ -f "$CLAUDE_DIR/keybindings.json" ]]; then
     ((BACKED_UP++)) || true
 fi
 
+# Global CLAUDE.md (user instructions / global memory)
+if [[ -f "$CLAUDE_DIR/CLAUDE.md" ]]; then
+    cp "$CLAUDE_DIR/CLAUDE.md" "$BACKUP_DIR/CLAUDE.md"
+    echo "  [OK] CLAUDE.md"
+    ((BACKED_UP++)) || true
+fi
+
 # Custom slash commands (non-destructive merge)
 if [[ -d "$CLAUDE_DIR/commands" ]]; then
     rsync -a "$CLAUDE_DIR/commands/" "$BACKUP_DIR/commands/"

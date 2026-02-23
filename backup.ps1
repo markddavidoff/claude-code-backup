@@ -82,10 +82,19 @@ if (Test-Path "$ClaudeDir\plugins\known_marketplaces.json") {
     $backedUp += "known_marketplaces.json"
 }
 
+# Global CLAUDE.md (user instructions / global memory)
+if (Test-Path "$ClaudeDir\CLAUDE.md") {
+    Copy-Item "$ClaudeDir\CLAUDE.md" "$BackupDir\CLAUDE.md" -Force
+    Write-Host "  [OK] CLAUDE.md" -ForegroundColor Green
+    $backedUp += "CLAUDE.md"
+}
+
 # Custom slash commands (non-destructive merge)
 if (Test-Path "$ClaudeDir\commands") {
     New-Item -ItemType Directory -Force -Path "$BackupDir\commands" | Out-Null
-    Copy-Item "$ClaudeDir\commands\*" "$BackupDir\commands\" -Recurse -Force
+    Get-ChildItem "$ClaudeDir\commands" -Force | ForEach-Object {
+        Copy-Item $_.FullName "$BackupDir\commands\$($_.Name)" -Recurse -Force
+    }
     Write-Host "  [OK] commands/ (merged)" -ForegroundColor Green
     $backedUp += "commands/"
 }
