@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(done)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(rsync:*)",
+      "Bash(git:*)",
+      "Bash(bash:*)",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3:*)"
     ]
   }
 }
