@@ -40,6 +40,24 @@ fi
 
 mkdir -p "$CLAUDE_DIR"
 
+# Create a safety backup of current config before overwriting
+TIMESTAMP=$(date "+%Y%m%d-%H%M%S")
+SAFETY_BACKUP="$SCRIPT_DIR/pre-restore-$TIMESTAMP.tar.gz"
+if [[ -d "$CLAUDE_DIR" ]] && [[ -n "$(ls -A "$CLAUDE_DIR" 2>/dev/null)" ]]; then
+    echo "  Creating safety backup of current config..."
+    if tar czf "$SAFETY_BACKUP" -C "$HOME" .claude 2>/dev/null; then
+        echo "  [OK] Saved to $SAFETY_BACKUP"
+    else
+        echo "  [ERROR] Could not create safety backup. Aborting restore."
+        exit 1
+    fi
+    # Also include ~/.mcp.json if it exists
+    if [[ -f "$HOME/.mcp.json" ]]; then
+        tar rf "${SAFETY_BACKUP%.gz}" -C "$HOME" .mcp.json 2>/dev/null && gzip -f "${SAFETY_BACKUP%.gz}" 2>/dev/null || true
+    fi
+    echo ""
+fi
+
 RESTORED=0
 
 # settings.json

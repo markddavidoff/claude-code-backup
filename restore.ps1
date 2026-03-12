@@ -35,6 +35,26 @@ if (-not $Force) {
 
 New-Item -ItemType Directory -Force -Path $ClaudeDir | Out-Null
 
+# Create a safety backup of current config before overwriting
+$timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+$safetyBackup = "$PSScriptRoot\pre-restore-$timestamp.zip"
+$hasContent = (Get-ChildItem -Path $ClaudeDir -Force -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
+if ($hasContent) {
+    Write-Host "  Creating safety backup of current config..." -ForegroundColor DarkGray
+    try {
+        $itemsToZip = @($ClaudeDir)
+        if (Test-Path "$env:USERPROFILE\.mcp.json") {
+            $itemsToZip += "$env:USERPROFILE\.mcp.json"
+        }
+        Compress-Archive -Path $itemsToZip -DestinationPath $safetyBackup -Force
+        Write-Host "  [OK] Saved to $safetyBackup" -ForegroundColor Green
+    } catch {
+        Write-Host "  [ERROR] Could not create safety backup. Aborting restore." -ForegroundColor Red
+        exit 1
+    }
+    Write-Host ""
+}
+
 $restored = @()
 
 # settings.json
