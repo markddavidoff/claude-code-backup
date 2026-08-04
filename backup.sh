@@ -92,8 +92,11 @@ if [[ -d "$CLAUDE_DIR/commands" ]]; then
 fi
 
 # Skills (non-destructive merge)
+# -L follows symlinks: many skills are symlinked into ~/.claude/skills/ from
+# ~/work/tooling/. Copy their real contents so the backup is portable to other
+# machines and so rsync doesn't try to replace a real dir with a machine-local symlink.
 if [[ -d "$CLAUDE_DIR/skills" ]]; then
-    rsync -a "$CLAUDE_DIR/skills/" "$BACKUP_DIR/skills/"
+    rsync -aL "$CLAUDE_DIR/skills/" "$BACKUP_DIR/skills/"
     echo "  [OK] skills/ (merged)"
     ((BACKED_UP++)) || true
 fi
